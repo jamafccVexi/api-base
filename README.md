@@ -268,4 +268,4 @@ $ oc policy add-role-to-user edit system:serviceaccount:jenkins:jenkins -n [nomb
 	* Use credentials from default remote of parent repository
 	* Shallow clone
 
-Esta plantilla se creó tomando como base lo expuesto en el libro [Architecture Patterns with Python](https://www.cosmicpython.com/book/preface.html)
+Esta plantilla se creó tomando como base lo expuesto en el libro [Architecture Patterns with Python](https://www.cosmicpython.com/book/preface.html)# api-base
