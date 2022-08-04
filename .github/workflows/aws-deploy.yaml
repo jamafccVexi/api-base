@@ -1,0 +1,42 @@
+# Sample workflow to access AWS resources when workflow is tied to branch
+# The workflow Creates static website using aws s3
+name: AWS Deploy
+on:
+  push:
+    branches:
+      - '!main**'
+env:
+  REPO_NAME : "api-base"
+  BUCKET_NAME : "codigo-fuente-dev"
+  AWS_REGION : "us-east-1"
+# permission can be added at job level or workflow level    
+permissions:
+      id-token: write
+      contents: read    # This is required for actions/checkout
+jobs:
+  S3PackageUpload:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install SSH key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.APICOMMON_KEY }}
+          name: id_rsa # optional
+          known_hosts: unnecessary
+          if_key_exists: fail
+      - name: Git clone the repository
+        uses: actions/checkout@v3
+      - run: |
+          sed -i 's/https:\/\/github.com\//git@github.com:/' .gitmodules
+          git submodule init
+          git submodule update
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::316592629795:role/github-oidc-dev
+          role-session-name: copyrole
+          aws-region: ${{ env.AWS_REGION }}
+      # Upload a file to AWS s3
+      - name:  Copy contents to s3
+        run: |
+          aws s3 cp . s3://${{ env.BUCKET_NAME }}/${{ env.REPO_NAME }}/ --recursive
